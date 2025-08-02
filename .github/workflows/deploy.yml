@@ -88,17 +88,36 @@ jobs:
           # Clean up old tar file
           rm -f simple-nodejs-app.tar.gz
     
-    - name: Copy Docker image to server
+    - name: Copy files to server
       uses: appleboy/scp-action@v0.1.7
       with:
         host: ${{ secrets.DO_HOST }}
         username: ${{ secrets.DO_USERNAME }}
         key: ${{ secrets.DO_SSH_KEY }}
         port: ${{ secrets.DO_PORT }}
-        source: "simple-nodejs-app.tar.gz"
+        source: "simple-nodejs-app.tar.gz,docker-compose.yml,Caddyfile"
         target: "/home/${{ secrets.DO_USERNAME }}/"
+        
+    - name: Setup application directory
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.DO_HOST }}
+        username: ${{ secrets.DO_USERNAME }}
+        key: ${{ secrets.DO_SSH_KEY }}
+        port: ${{ secrets.DO_PORT }}
+        script: |
+          # Create app directory and move files
+          mkdir -p /home/${{ secrets.DO_USERNAME }}/app
+          mv /home/${{ secrets.DO_USERNAME }}/docker-compose.yml /home/${{ secrets.DO_USERNAME }}/app/
+          mv /home/${{ secrets.DO_USERNAME }}/Caddyfile /home/${{ secrets.DO_USERNAME }}/app/
+          
+          # Install docker-compose if not present
+          if ! command -v docker-compose &> /dev/null; then
+            sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            sudo chmod +x /usr/local/bin/docker-compose
+          fi
     
-    - name: Load and run Docker container
+    - name: Deploy with Docker Compose
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.DO_HOST }}
@@ -109,29 +128,24 @@ jobs:
           # Load the Docker image
           docker load < /home/${{ secrets.DO_USERNAME }}/simple-nodejs-app.tar.gz
           
-          # Check if container exists, if so restart it with new image
-          if docker ps -a --format '{{.Names}}' | grep -q "^simple-nodejs-app$"; then
-            echo "Container exists, updating with new image..."
-            docker rm simple-nodejs-app
-          fi
+          # Tag the image for docker-compose
+          docker tag simple-nodejs-app:latest simple-nodejs-app:latest
           
-          # Run the new container
-          docker run -d \
-            --name simple-nodejs-app \
-            -p 80:3000 \
-            --restart unless-stopped \
-            simple-nodejs-app:latest
+          # Deploy using docker-compose
+          cd /home/${{ secrets.DO_USERNAME }}/app
+          docker-compose down
+          docker-compose up -d --build
           
-          # Wait for container to start
-          sleep 10
+          # Wait for services to start
+          sleep 15
           
-          # Test if the app is running
-          curl -f http://localhost || exit 1
+          # Test if the app is running through Caddy
+          curl -f http://localhost || curl -f http://localhost:3000 || exit 1
           
           # Clean up tar file
           rm -f /home/${{ secrets.DO_USERNAME }}/simple-nodejs-app.tar.gz
           
-          # Show running containers
+          # Show running services
           echo "✅ Deployment successful!"
-          echo "Running containers:"
-          docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Ports}}\t{{.Status}}"
+          echo "Running services:"
+          docker-compose ps

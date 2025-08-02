@@ -1,0 +1,35 @@
+# Replace YOUR_DOMAIN.com with your actual domain
+# If you don't have a domain, use your droplet IP
+YOUR_DOMAIN.com {
+    reverse_proxy nodejs-app:3000
+    
+    # Automatic HTTPS with Let's Encrypt
+    tls internal
+    
+    # Security headers
+    header {
+        # Enable HSTS
+        Strict-Transport-Security max-age=31536000;
+        # Prevent MIME sniffing
+        X-Content-Type-Options nosniff
+        # Enable XSS protection
+        X-XSS-Protection "1; mode=block"
+        # Prevent framing
+        X-Frame-Options DENY
+        # Remove server information
+        -Server
+    }
+    
+    # Gzip compression
+    encode gzip
+    
+    # Logging
+    log {
+        output file /var/log/caddy/access.log
+    }
+}
+
+# Redirect www to non-www (optional)
+www.YOUR_DOMAIN.com {
+    redir https://YOUR_DOMAIN.com{uri} permanent
+}

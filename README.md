@@ -12,31 +12,37 @@ npm start
 
 The app will start on `http://localhost:3000`
 
-### Docker Deployment
+### Docker Compose Deployment (Recommended)
 
-#### Build the Docker image:
+#### With SSL (requires domain):
+```bash
+# Update Caddyfile with your domain
+# Start all services
+docker-compose up -d
+```
+
+#### Without SSL (IP only):
+```bash
+# Modify Caddyfile to use :80 instead of domain
+docker-compose up -d
+```
+
+#### Traditional Docker:
 ```bash
 docker build -t simple-nodejs-app .
-```
-
-#### Run the container:
-```bash
 docker run -p 3000:3000 simple-nodejs-app
-```
-
-#### Or use Docker Compose (optional):
-```bash
-docker run -d -p 3000:3000 --name my-node-app simple-nodejs-app
 ```
 
 ## Features
 
 - ✅ Minimal Node.js + Express.js setup
 - ✅ Docker-ready with optimized Dockerfile
+- ✅ Docker Compose for multi-container orchestration
+- ✅ Caddy reverse proxy with automatic SSL
 - ✅ Security best practices (non-root user)
 - ✅ Perfect for CI/CD testing
 - ✅ GitHub Actions compatible
-- ✅ Container hosting ready
+- ✅ Production-ready with HTTPS
 
 ## GitHub Actions
 
