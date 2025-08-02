@@ -1,6 +1,6 @@
-import express from "express";
-
+const express = require('express');
 const app = express();
+const port = process.env.PORT || 3000;
 
 app.get('/', (req, res) => {
   res.send(`
@@ -43,7 +43,6 @@ app.get('/', (req, res) => {
   `);
 });
 
-const port = parseInt(process.env.PORT || '5000', 10);
 app.listen(port, '0.0.0.0', () => {
   console.log(`Server running at http://localhost:${port}`);
 });

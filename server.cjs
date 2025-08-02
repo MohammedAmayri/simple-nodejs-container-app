@@ -1,9 +1,9 @@
-import express from "express";
+const http = require('http');
+const port = process.env.PORT || 3000;
 
-const app = express();
-
-app.get('/', (req, res) => {
-  res.send(`
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/html' });
+  res.end(`
     <!DOCTYPE html>
     <html>
     <head>
@@ -43,7 +43,6 @@ app.get('/', (req, res) => {
   `);
 });
 
-const port = parseInt(process.env.PORT || '5000', 10);
-app.listen(port, '0.0.0.0', () => {
+server.listen(port, '0.0.0.0', () => {
   console.log(`Server running at http://localhost:${port}`);
 });
