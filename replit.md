@@ -31,6 +31,9 @@ The project now has a minimal, clean structure with only essential files:
 ├── index.js          # Main application file
 ├── package.json      # Project configuration and dependencies
 ├── package-lock.json # Locked dependency versions
+├── Dockerfile        # Docker container configuration
+├── .dockerignore     # Files to exclude from Docker build
+├── README.md         # Deployment and usage instructions
 ├── node_modules/     # Express.js and its dependencies (69 packages total)
 └── replit.md         # Project documentation
 ```
@@ -43,3 +46,4 @@ The project now has a minimal, clean structure with only essential files:
 ### Development Environment
 - **Replit Integration**: Configured for Replit development environment
 - **Node.js**: Runtime environment with minimal dependencies for fast startup
+- **Docker Ready**: Dockerfile configured for container deployment with security best practices
