@@ -71,7 +71,7 @@ jobs:
       run: |
         docker save simple-nodejs-app:latest | gzip > simple-nodejs-app.tar.gz
     
-    - name: Deploy to Digital Ocean
+    - name: Prepare deployment on Digital Ocean
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.DO_HOST }}
@@ -79,11 +79,10 @@ jobs:
         key: ${{ secrets.DO_SSH_KEY }}
         port: ${{ secrets.DO_PORT }}
         script: |
-          # Stop and remove existing container if it exists
+          # Stop existing container if running (but don't remove)
           docker stop simple-nodejs-app || true
-          docker rm simple-nodejs-app || true
           
-          # Remove old image
+          # Remove old image to save space
           docker rmi simple-nodejs-app:latest || true
           
           # Clean up old tar file
@@ -110,6 +109,12 @@ jobs:
           # Load the Docker image
           docker load < /home/${{ secrets.DO_USERNAME }}/simple-nodejs-app.tar.gz
           
+          # Check if container exists, if so restart it with new image
+          if docker ps -a --format '{{.Names}}' | grep -q "^simple-nodejs-app$"; then
+            echo "Container exists, updating with new image..."
+            docker rm simple-nodejs-app
+          fi
+          
           # Run the new container
           docker run -d \
             --name simple-nodejs-app \
@@ -126,4 +131,7 @@ jobs:
           # Clean up tar file
           rm -f /home/${{ secrets.DO_USERNAME }}/simple-nodejs-app.tar.gz
           
-          echo "✅ Deployment successful! App is running on port 80"
+          # Show running containers
+          echo "✅ Deployment successful!"
+          echo "Running containers:"
+          docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Ports}}\t{{.Status}}"

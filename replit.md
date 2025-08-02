@@ -47,3 +47,5 @@ The project now has a minimal, clean structure with only essential files:
 - **Replit Integration**: Configured for Replit development environment
 - **Node.js**: Runtime environment with minimal dependencies for fast startup
 - **Docker Ready**: Dockerfile configured for container deployment with security best practices
+- **Multi-container Support**: Configured to run alongside other containers on the same droplet
+- **Smart Deployment**: Uses container restart instead of full recreation for faster deployments
