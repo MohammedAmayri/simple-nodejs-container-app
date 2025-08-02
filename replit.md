@@ -23,11 +23,22 @@ The application is built with a minimal Node.js and Express.js setup:
 - **GitHub Actions Compatible**: Minimal dependencies make it perfect for CI/CD testing
 - **Lightweight**: No complex dependencies, databases, or frontend frameworks
 
+## Project Structure
+
+The project now has a minimal, clean structure with only essential files:
+
+```
+├── index.js          # Main application file
+├── package.json      # Project configuration and dependencies
+├── package-lock.json # Locked dependency versions
+├── node_modules/     # Express.js and its dependencies (69 packages total)
+└── replit.md         # Project documentation
+```
+
 ## Dependencies
 
 ### Core Dependencies
-- **Express.js**: Lightweight web framework for Node.js
-- **TypeScript**: Type-safe JavaScript development with TSX runtime
+- **Express.js**: Lightweight web framework for Node.js (only dependency)
 
 ### Development Environment
 - **Replit Integration**: Configured for Replit development environment
