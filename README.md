@@ -38,16 +38,28 @@ docker run -d -p 3000:3000 --name my-node-app simple-nodejs-app
 - ✅ GitHub Actions compatible
 - ✅ Container hosting ready
 
+## GitHub Actions
+
+This repository includes a GitHub Actions workflow that automatically:
+- Tests the Node.js application
+- Builds the Docker image
+- Tests the container
+- Validates the deployment
+
+The workflow runs on every push to the main branch.
+
 ## Deployment
 
 This app is ready for deployment on any container hosting platform:
-- Docker
+- **Google Cloud Run** (recommended for serverless)
+- **Railway** (GitHub integration)
+- **Fly.io** (global edge deployment)
+- **Docker Hub** + any platform
 - Kubernetes
-- Google Cloud Run
 - AWS ECS/Fargate
 - Azure Container Instances
-- Railway
-- Fly.io
+
+See `deploy-instructions.md` for detailed deployment steps.
 
 ## License
 
