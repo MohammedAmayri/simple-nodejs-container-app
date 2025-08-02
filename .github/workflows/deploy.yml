@@ -37,7 +37,7 @@ jobs:
         # Clean up
         kill $APP_PID
 
-  build-and-push:
+  build-and-deploy:
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
@@ -52,7 +52,7 @@ jobs:
       run: |
         docker build -t simple-nodejs-app:latest .
         
-    - name: Test Docker image
+    - name: Test Docker image locally
       run: |
         # Run container in background
         docker run -d -p 3001:3000 --name test-container simple-nodejs-app:latest
@@ -67,5 +67,63 @@ jobs:
         docker stop test-container
         docker rm test-container
     
-    - name: Build success
-      run: echo "✅ Docker build and test completed successfully!"
+    - name: Save Docker image
+      run: |
+        docker save simple-nodejs-app:latest | gzip > simple-nodejs-app.tar.gz
+    
+    - name: Deploy to Digital Ocean
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.DO_HOST }}
+        username: ${{ secrets.DO_USERNAME }}
+        key: ${{ secrets.DO_SSH_KEY }}
+        port: ${{ secrets.DO_PORT }}
+        script: |
+          # Stop and remove existing container if it exists
+          docker stop simple-nodejs-app || true
+          docker rm simple-nodejs-app || true
+          
+          # Remove old image
+          docker rmi simple-nodejs-app:latest || true
+          
+          # Clean up old tar file
+          rm -f simple-nodejs-app.tar.gz
+    
+    - name: Copy Docker image to server
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.DO_HOST }}
+        username: ${{ secrets.DO_USERNAME }}
+        key: ${{ secrets.DO_SSH_KEY }}
+        port: ${{ secrets.DO_PORT }}
+        source: "simple-nodejs-app.tar.gz"
+        target: "/home/${{ secrets.DO_USERNAME }}/"
+    
+    - name: Load and run Docker container
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.DO_HOST }}
+        username: ${{ secrets.DO_USERNAME }}
+        key: ${{ secrets.DO_SSH_KEY }}
+        port: ${{ secrets.DO_PORT }}
+        script: |
+          # Load the Docker image
+          docker load < /home/${{ secrets.DO_USERNAME }}/simple-nodejs-app.tar.gz
+          
+          # Run the new container
+          docker run -d \
+            --name simple-nodejs-app \
+            -p 80:3000 \
+            --restart unless-stopped \
+            simple-nodejs-app:latest
+          
+          # Wait for container to start
+          sleep 10
+          
+          # Test if the app is running
+          curl -f http://localhost || exit 1
+          
+          # Clean up tar file
+          rm -f /home/${{ secrets.DO_USERNAME }}/simple-nodejs-app.tar.gz
+          
+          echo "✅ Deployment successful! App is running on port 80"
