@@ -1,0 +1,42 @@
+deployer@ubuntu-s-1vcpu-1gb-amd-lon1-01:~$ echo "=== Current Containers ==="
+docker ps
+echo "=== Available Images ==="
+docker images
+=== Current Containers ===
+CONTAINER ID   IMAGE                            COMMAND                  CREATED        STATUS       PORTS                                       NAMES
+ccd71499574b   simple-nodejs-app:latest         "docker-entrypoint.s…"   4 hours ago    Up 4 hours   0.0.0.0:3000->3000/tcp, :::3000->3000/tcp   simple-nodejs-app
+591919b085b8   mo231993/lkdevbackend16:latest   "flask run --host=0.…"   2 months ago   Up 6 weeks   0.0.0.0:8080->8080/tcp, :::8080->8080/tcp   lk_dev_container
+=== Available Images ===
+REPOSITORY                TAG        IMAGE ID       CREATED        SIZE
+simple-nodejs-app         latest     394531eeabe0   4 hours ago    130MB
+<none>                    <none>     1f94935ed684   19 hours ago   130MB
+<none>                    <none>     28cfd0814f1d   20 hours ago   130MB
+mo231993/lkdevbackend16   latest     cc859060bdad   2 months ago   1.16GB
+mo231993/lkdevbackend15   latest     4f7c1c8deca4   3 months ago   1.15GB
+caddy                     2-alpine   6ddf74dfb618   3 months ago   50.5MB
+deployer@ubuntu-s-1vcpu-1gb-amd-lon1-01:~$ echo "=== App Directory ==="
+ls -la /home/deployer/app/ 2>/dev/null || echo "App directory not created yet"
+=== App Directory ===
+total 16
+drwxrwxr-x 2 deployer deployer 4096 Aug  3 08:08 .
+drwxr-x--- 5 deployer deployer 4096 Aug  3 08:08 ..
+-rw-r--r-- 1 deployer deployer  787 Aug  3 08:07 Caddyfile
+-rw-r--r-- 1 deployer deployer  625 Aug  3 08:07 docker-compose.yml
+deployer@ubuntu-s-1vcpu-1gb-amd-lon1-01:~$ echo "=== Network Ports ==="
+sudo netstat -tlnp | grep -E ':80|:443|:3000|:8080'
+=== Network Ports ===
+[sudo] password for deployer:
+sudo: netstat: command not found
+deployer@ubuntu-s-1vcpu-1gb-amd-lon1-01:~$ echo "=== Testing Current Access ==="
+curl -s -o /dev/null -w "Node.js app (port 3000): %{http_code}\n" http://localhost:3000
+curl -s -o /dev/null -w "Flask app (port 8080): %{http_code}\n" http://localhost:8080
+=== Testing Current Access ===
+Node.js app (port 3000): 200
+Flask app (port 8080): 200
+deployer@ubuntu-s-1vcpu-1gb-amd-lon1-01:~$ echo "=== Testing Domain ==="
+curl -s -o /dev/null -w "Domain HTTP: %{http_code}\n" http://lkdevcontaineronline.online 2>/dev/null || echo "Domain HTTP: Not accessible yet"
+curl -s -o /dev/null -w "Domain HTTPS: %{http_code}\n" https://lkdevcontaineronline.online 2>/dev/null || echo "Domain HTTPS: Not accessible yet"
+=== Testing Domain ===
+Domain HTTP: 301
+Domain HTTPS: 200
+deployer@ubuntu-s-1vcpu-1gb-amd-lon1-01:~$
