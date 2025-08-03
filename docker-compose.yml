@@ -18,15 +18,13 @@ services:
 
   # Your Node.js application
   nodejs-app:
-    build: .
+    image: simple-nodejs-app:latest
     container_name: simple-nodejs-app
     restart: unless-stopped
     expose:
       - "3000"
     networks:
       - web
-    depends_on:
-      - caddy
 
 volumes:
   caddy_data:
