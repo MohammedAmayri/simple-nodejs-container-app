@@ -1,33 +1,23 @@
 lkdevcontaineronline.online {
-    reverse_proxy nodejs-app:3000
-    
-    # Automatic HTTPS with Let's Encrypt
-    # tls is automatic for domains, no need to specify
-    
-    # Security headers
+    reverse_proxy nodejs-app:3000 {
+        transport http {
+            dial_timeout 5s
+        }
+        # Optional: enable simple round robin if multiple backends later
+        lb_policy round_robin
+    }
+
     header {
-        # Enable HSTS
-        Strict-Transport-Security max-age=31536000;
-        # Prevent MIME sniffing
-        X-Content-Type-Options nosniff
-        # Enable XSS protection
+        Strict-Transport-Security "max-age=31536000;"
+        X-Content-Type-Options "nosniff"
         X-XSS-Protection "1; mode=block"
-        # Prevent framing
         X-Frame-Options DENY
-        # Remove server information
         -Server
     }
-    
-    # Gzip compression
+
     encode gzip
-    
-    # Logging
+
     log {
         output file /var/log/caddy/access.log
     }
-}
-
-# Redirect www to non-www
-www.lkdevcontaineronline.online {
-    redir https://lkdevcontaineronline.online{uri} permanent
 }

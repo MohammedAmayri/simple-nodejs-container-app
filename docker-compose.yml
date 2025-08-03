@@ -1,35 +1,38 @@
-version: '3.8'
+    version: '3.8'
 
-services:
-  # Caddy reverse proxy with automatic SSL
-  caddy:
-    image: caddy:2-alpine
-    container_name: caddy-proxy
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
+    services:
+      nodejs-app:
+        build:
+          context: .
+          dockerfile: Dockerfile
+        container_name: simple-nodejs-app
+        restart: unless-stopped
+        expose:
+          - "3000"
+        networks:
+          - web
+
+      caddy:
+        image: caddy:2-alpine
+        container_name: caddy-proxy
+        restart: unless-stopped
+        depends_on:
+          - nodejs-app
+        ports:
+          - "80:80"
+          - "443:443"
+        volumes:
+          - ./Caddyfile:/etc/caddy/Caddyfile:ro
+          - caddy_data:/data
+          - caddy_config:/config
+        networks:
+          - web
+
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-      - caddy_config:/config
+      caddy_data:
+      caddy_config:
+
     networks:
-      - web
-
-  # Your Node.js application
-  nodejs-app:
-    image: simple-nodejs-app:latest
-    container_name: simple-nodejs-app
-    restart: unless-stopped
-    expose:
-      - "3000"
-    networks:
-      - web
-
-volumes:
-  caddy_data:
-  caddy_config:
-
-networks:
-  web:
-    driver: bridge
+      web:
+        driver: bridge
+  
