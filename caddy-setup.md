@@ -35,12 +35,13 @@ If you have a domain:
 # YOUR_DOMAIN.com -> YOUR_DROPLET_IP
 ```
 
-### 2. Update Caddyfile
-Edit `Caddyfile` and replace `YOUR_DOMAIN.com` with your actual domain:
+### 2. Domain Already Configured ✅
+Your domain `lkdevcontaineronline.online` is already configured in the Caddyfile:
 ```
-yourdomain.com {
+lkdevcontaineronline.online {
     reverse_proxy nodejs-app:3000
-    # ... rest stays the same
+    # Automatic HTTPS with Let's Encrypt
+    # Security headers and compression enabled
 }
 ```
 
@@ -72,9 +73,10 @@ The workflow will automatically use Docker Compose for deployments.
 
 ## Access Your App
 
-- **HTTPS**: `https://yourdomain.com`
+- **HTTPS**: `https://lkdevcontaineronline.online`
 - **HTTP**: Automatically redirects to HTTPS
-- **Your Flask app**: Can add to docker-compose.yml later
+- **Your Flask app**: Still accessible at `http://46.101.67.240:8080`
+- **www redirect**: `www.lkdevcontaineronline.online` → `https://lkdevcontaineronline.online`
 
 ## No Domain? Use IP + Self-Signed
 

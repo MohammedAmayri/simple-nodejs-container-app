@@ -1,10 +1,8 @@
-# Replace YOUR_DOMAIN.com with your actual domain
-# If you don't have a domain, use your droplet IP
-YOUR_DOMAIN.com {
+lkdevcontaineronline.online {
     reverse_proxy nodejs-app:3000
     
     # Automatic HTTPS with Let's Encrypt
-    tls internal
+    # tls is automatic for domains, no need to specify
     
     # Security headers
     header {
@@ -29,7 +27,7 @@ YOUR_DOMAIN.com {
     }
 }
 
-# Redirect www to non-www (optional)
-www.YOUR_DOMAIN.com {
-    redir https://YOUR_DOMAIN.com{uri} permanent
+# Redirect www to non-www
+www.lkdevcontaineronline.online {
+    redir https://lkdevcontaineronline.online{uri} permanent
 }
