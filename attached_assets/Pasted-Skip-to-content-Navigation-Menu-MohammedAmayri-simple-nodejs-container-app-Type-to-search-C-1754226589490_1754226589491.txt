@@ -1,0 +1,85 @@
+Skip to content
+Navigation Menu
+MohammedAmayri
+simple-nodejs-container-app
+
+Type / to search
+Code
+Issues
+Pull requests
+Actions
+Projects
+Wiki
+Security
+1
+Insights
+Settings
+Build and Deploy
+Improve application deployment and configuration for container hosting #11
+Jobs
+Run details
+Annotations
+1 error
+build-and-deploy
+failed 3 minutes ago in 21s
+Search logs
+2s
+3s
+2s
+0s
+5s
+4s
+#8 [3/8] COPY package*.json ./
+#8 DONE 0.0s
+
+#9 [4/8] RUN npm ci --only=production
+#9 0.257 npm warn config only Use `--omit=dev` to omit dev dependencies from the install.
+#9 1.412 
+#9 1.412 added 69 packages, and audited 70 packages in 1s
+#9 1.412 
+#9 1.412 14 packages are looking for funding
+#9 1.412   run `npm fund` for details
+#9 1.414 
+#9 1.414 found 0 vulnerabilities
+#9 1.415 npm notice
+#9 1.415 npm notice New major version of npm available! 10.8.2 -> 11.5.2
+#9 1.415 npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.5.2
+#9 1.415 npm notice To update run: npm install -g npm@11.5.2
+#9 1.415 npm notice
+#9 DONE 1.5s
+
+#10 [5/8] COPY . .
+#10 DONE 0.0s
+
+#11 [6/8] RUN addgroup -g 1001 -S nodejs
+#11 DONE 0.1s
+
+#12 [7/8] RUN adduser -S nodeuser -u 1001
+#12 DONE 0.1s
+
+#13 [8/8] RUN printf 'const http=require("http");http.get({host:"127.0.0.1",port:3000},r=>{process.exit(r.statusCode===200?0:1)}).on("error",()=>process.exit(1));' > /app/healthcheck.js
+#13 0.138 /bin/sh: can't create /app/healthcheck.js: Permission denied
+#13 ERROR: process "/bin/sh -c printf 'const http=require(\"http\");http.get({host:\"127.0.0.1\",port:3000},r=>{process.exit(r.statusCode===200?0:1)}).on(\"error\",()=>process.exit(1));' > /app/healthcheck.js" did not complete successfully: exit code: 1
+------
+ > [8/8] RUN printf 'const http=require("http");http.get({host:"127.0.0.1",port:3000},r=>{process.exit(r.statusCode===200?0:1)}).on("error",()=>process.exit(1));' > /app/healthcheck.js:
+0.138 /bin/sh: can't create /app/healthcheck.js: Permission denied
+------
+Dockerfile:25
+--------------------
+  23 |     
+  24 |     # healthcheck using Node to avoid needing curl/wget (checks IPv4)
+  25 | >>> RUN printf 'const http=require("http");http.get({host:"127.0.0.1",port:3000},r=>{process.exit(r.statusCode===200?0:1)}).on("error",()=>process.exit(1));' > /app/healthcheck.js
+  26 |     
+  27 |     HEALTHCHECK --interval=10s --timeout=5s --retries=3 CMD ["node","/app/healthcheck.js"]
+--------------------
+ERROR: failed to build: failed to solve: process "/bin/sh -c printf 'const http=require(\"http\");http.get({host:\"127.0.0.1\",port:3000},r=>{process.exit(r.statusCode===200?0:1)}).on(\"error\",()=>process.exit(1));' > /app/healthcheck.js" did not complete successfully: exit code: 1
+Error: Process completed with exit code 1.
+0s
+0s
+0s
+0s
+0s
+0s
+1s
+0s
+0s

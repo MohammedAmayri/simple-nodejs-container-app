@@ -13,16 +13,20 @@ RUN npm ci --only=production
 # Copy the rest of the application code
 COPY . .
 
-# Expose the port the app runs on
-EXPOSE 3000
+# Create healthcheck file BEFORE switching to non-root user
+RUN printf 'const http=require("http");http.get({host:"127.0.0.1",port:3000},r=>{process.exit(r.statusCode===200?0:1)}).on("error",()=>process.exit(1));' > /app/healthcheck.js
 
 # Create a non-root user for security
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nodeuser -u 1001
+
+# Change ownership of app directory to nodeuser
+RUN chown -R nodeuser:nodejs /app
+
 USER nodeuser
 
-# healthcheck using Node to avoid needing curl/wget (checks IPv4)
-RUN printf 'const http=require("http");http.get({host:"127.0.0.1",port:3000},r=>{process.exit(r.statusCode===200?0:1)}).on("error",()=>process.exit(1));' > /app/healthcheck.js
+# Expose the port the app runs on
+EXPOSE 3000
 
 HEALTHCHECK --interval=10s --timeout=5s --retries=3 CMD ["node","/app/healthcheck.js"]
 

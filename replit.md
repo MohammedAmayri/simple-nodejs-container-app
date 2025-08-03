@@ -70,3 +70,8 @@ The project now has a minimal, clean structure with only essential files:
 - Domain accessible at https://lkdevcontaineronline.online
 - Multi-container environment with Flask app coexistence
 - GitHub Actions pipeline fully functional
+
+## Latest Fix (August 3, 2025)
+**Issue**: Docker build failing due to permission error when creating healthcheck file
+**Solution**: Reordered Dockerfile operations to create healthcheck before switching to non-root user
+**Status**: Fixed - deployment should complete successfully
