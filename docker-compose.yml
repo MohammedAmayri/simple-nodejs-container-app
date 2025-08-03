@@ -26,6 +26,16 @@ services:
     networks:
       - web
 
+  # Existing Flask application
+  flask-app:
+    image: mo231993/lkdevbackend16:latest
+    container_name: lk_dev_container
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    networks:
+      - web
+
 volumes:
   caddy_data:
   caddy_config:
