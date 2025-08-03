@@ -131,17 +131,23 @@ jobs:
           # Tag the image for docker-compose
           docker tag simple-nodejs-app:latest simple-nodejs-app:latest
           
-          # Deploy using docker-compose
           cd /home/${{ secrets.DO_USERNAME }}/app
           docker-compose down
           docker-compose up -d
-          
-          # Wait for services to start
-          sleep 15
-          
-          # Test if the app is running through Caddy
-          curl -f http://localhost || curl -f http://localhost:3000 || exit 1
-          
+
+          # Wait for the live domain to respond (max ~1 minute)
+          for i in {1..12}; do
+            if curl -fsS https://lkdevcontaineronline.online >/dev/null; then
+              echo "✅ Live domain is up"
+              break
+            fi
+            echo "Waiting for live site... ($i/12)"
+            sleep 5
+          done
+
+          # Final gate — fail if still not responding
+          curl -f https://lkdevcontaineronline.online || { echo "Deployment failed: site not healthy"; exit 1; }
+
           # Clean up tar file
           rm -f /home/${{ secrets.DO_USERNAME }}/simple-nodejs-app.tar.gz
           
