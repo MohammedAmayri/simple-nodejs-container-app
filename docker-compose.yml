@@ -1,38 +1,35 @@
-    version: '3.8'
+version: '3.8'
 
-    services:
-      nodejs-app:
-        build:
-          context: .
-          dockerfile: Dockerfile
-        container_name: simple-nodejs-app
-        restart: unless-stopped
-        expose:
-          - "3000"
-        networks:
-          - web
-
-      caddy:
-        image: caddy:2-alpine
-        container_name: caddy-proxy
-        restart: unless-stopped
-        depends_on:
-          - nodejs-app
-        ports:
-          - "80:80"
-          - "443:443"
-        volumes:
-          - ./Caddyfile:/etc/caddy/Caddyfile:ro
-          - caddy_data:/data
-          - caddy_config:/config
-        networks:
-          - web
-
-    volumes:
-      caddy_data:
-      caddy_config:
-
+services:
+  nodejs-app:
+    image: simple-nodejs-app:latest
+    container_name: simple-nodejs-app
+    restart: unless-stopped
+    expose:
+      - "3000"
     networks:
-      web:
-        driver: bridge
-  
+      - web
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: caddy-proxy
+    restart: unless-stopped
+    depends_on:
+      - nodejs-app
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - web
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  web:
+    driver: bridge
